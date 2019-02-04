@@ -3,13 +3,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using Newtonsoft.Json;
 using NLua;
+using System.Threading.Tasks;
 // ReSharper disable PossibleNullReferenceException
 
 namespace AZLpixelArtExporter
 {
     public static class PixelArtExporter
     {
-        
+        private static  Color BgColor = Color.FromArgb(255, 212, 212, 212);
         private const string BaseLuaFolder = "./LuaScripts/";
 
         public static ColoringTemplate[] GetColoringTemplates()
@@ -22,32 +23,36 @@ namespace AZLpixelArtExporter
             return coloringTemplates;
         }
 
-        public static Bitmap[] GetColoredBitmaps(ColoringTemplate[] coloringTemplates, int cellLength = 20, int cellWeight = 20)
+        public static Bitmap[] GetColoredBitmaps(ColoringTemplate[] coloringTemplates, int cellHeight = 20, int cellWidth = 20)
         {
             Bitmap[] renderedBitmaps = new Bitmap[coloringTemplates.Length];
-            for (int i = 0; i < coloringTemplates.Length; i++)
-                renderedBitmaps[i] = MakePrint(coloringTemplates[i], Color.FromArgb(255, 212, 212, 212));
+            Parallel.For(0, 
+                coloringTemplates.Length, 
+                new ParallelOptions { MaxDegreeOfParallelism = 8 }, 
+                (i, parallelLoopState) => renderedBitmaps[i] = MakePrint(coloringTemplates[i], cellHeight, cellWidth));
+            //var parallelResult = Parallel.ForEach(coloringTemplates, new ParallelOptions {MaxDegreeOfParallelism = 8}, (coloringTemplate) => MakePrint(coloringTemplate));
+            //for (int i = 0; i < coloringTemplates.Length; i++)
+            //    renderedBitmaps[i] = MakePrint(coloringTemplates[i], Color.FromArgb(255, 212, 212, 212));
 
             return renderedBitmaps;
         }
 
-        private static Bitmap MakePrint(ColoringTemplate template, Color bgColor)
+        private static Bitmap MakePrint(ColoringTemplate template, int cellHeight, int cellWidth)
         {
-            int pxPerCell = 20;
-            int height = template.Height * pxPerCell;
-            int width = template.Length * pxPerCell;
+            int height = template.Height * cellHeight;
+            int width = template.Length * cellWidth;
 
             var bitmap = new Bitmap(width, height, PixelFormat.Format32bppArgb);
-            bitmap = ColorRectangle(bitmap, bgColor, 0, 0, bitmap.Width, bitmap.Height);
+            bitmap = ColorRectangle(bitmap, BgColor, 0, 0, bitmap.Width, bitmap.Height);
             foreach (var cell in template.Cells)
             {
 
                 bitmap = ColorRectangle(bitmap, 
                     template.Colors[cell.ColorNum - 1], 
-                    cell.X * pxPerCell,
-                    (template.Height - cell.Y - 1) * pxPerCell, 
-                    pxPerCell, 
-                    pxPerCell);
+                    cell.X * cellWidth,
+                    (template.Height - cell.Y - 1) * cellHeight,
+                    cellWidth,
+                    cellHeight);
             }
 
             return bitmap;

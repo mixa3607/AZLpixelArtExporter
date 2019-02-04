@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Threading;
 
 namespace AZLpixelArtExporter
 {
@@ -9,10 +10,29 @@ namespace AZLpixelArtExporter
     {
         static void Main(string[] args)
         {
-            bool isRemovePrev = args.Length > 0 && args[0] == "-r";
+            int cellHeight = 20;
+            int cellWidth = 20;
+            bool isRemovePrev = args.Length > 3 && args[2] == "-r";
+
+            if (args.Length >= 2)
+            {
+                cellHeight = Convert.ToInt32(args[0]);
+                cellWidth = Convert.ToInt32(args[1]);
+            }
+            else
+            {
+                Console.WriteLine($"Use: {System.Diagnostics.Process.GetCurrentProcess().ProcessName} <PixelHeight> <PixelWidth> [-r]");
+                throw new Exception();
+            }
+
+            if (Directory.Exists(OutImgFolder) && isRemovePrev)
+            {
+                Directory.Delete(OutImgFolder, true);
+                Console.WriteLine("Prev images deleted");
+            }
             Console.Write("Rendering images...");
             var templates = PixelArtExporter.GetColoringTemplates();
-            var bitmaps = PixelArtExporter.GetColoredBitmaps(templates);
+            var bitmaps = PixelArtExporter.GetColoredBitmaps(templates, cellHeight, cellWidth);
             Console.WriteLine("OK");
 
             SaveBitmaps(bitmaps, templates, isRemovePrev);
@@ -21,14 +41,12 @@ namespace AZLpixelArtExporter
         private const string OutImgFolder = "./IMG/";
         static void SaveBitmaps(Bitmap[] bitmaps, ColoringTemplate[] templates, bool isRemovePrev)
         {
-            if (Directory.Exists(OutImgFolder) && isRemovePrev)
-            {
-                Directory.Delete(OutImgFolder, true);
-                Console.WriteLine("Prev images deleted");
-            }
-
             if (!Directory.Exists(OutImgFolder))
+            {
                 Directory.CreateDirectory(OutImgFolder);
+                Console.WriteLine("Folder for images created");
+            }
+                
 
             if (templates.Length != bitmaps.Length)
             {
