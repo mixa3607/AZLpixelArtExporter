@@ -15,7 +15,7 @@ namespace AZLpixelArtExporter
             bool isRemovePrev = false;
             if (args.Length >= 3)
             {
-                PixelArtExporter.BgColor = System.Drawing.ColorTranslator.FromHtml(args[3]);
+                PixelArtExporter.BgColor = System.Drawing.ColorTranslator.FromHtml(args[2]);
             }
             if (args.Length >= 2)
             {
