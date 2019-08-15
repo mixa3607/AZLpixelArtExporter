@@ -12,8 +12,11 @@ namespace AZLpixelArtExporter
         {
             int cellHeight = 20;
             int cellWidth = 20;
-            bool isRemovePrev = args.Length > 3 && args[2] == "-r";
-
+            bool isRemovePrev = false;
+            if (args.Length >= 3)
+            {
+                PixelArtExporter.BgColor = System.Drawing.ColorTranslator.FromHtml(args[3]);
+            }
             if (args.Length >= 2)
             {
                 cellHeight = Convert.ToInt32(args[0]);
