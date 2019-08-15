@@ -9,8 +9,7 @@ this is a file with coloring templates. For get it you need.
 4. decompile unlocked "activity_coloring_template.lua" (Luajit 2.1.0 compiled lua)
 
 ```
-AZLpixelartExporter <PixelHeight> <PixelWidth> [-r]
+AZLpixelartExporter <PixelHeight> <PixelWidth> <optional color>
 "<PixelHeight>" and "<PixelWidth>" is a size of pixel/cell in px
-"-r" programm will delete "./IMG" before save rendered images.
-Example: "AZLpixelartExporter 20 20 -r"
+Example: "AZLpixelartExporter 20 20 #00000000"
 ```
