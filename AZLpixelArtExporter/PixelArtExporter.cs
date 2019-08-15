@@ -10,7 +10,7 @@ namespace AZLpixelArtExporter
 {
     public static class PixelArtExporter
     {
-        private static  Color BgColor = Color.FromArgb(255, 212, 212, 212);
+        public static  Color BgColor = Color.FromArgb(255, 212, 212, 212);
         private const string BaseLuaFolder = "./LuaScripts/";
 
         public static ColoringTemplate[] GetColoringTemplates()
